@@ -131,7 +131,7 @@ const downloadLayout = async ({ publicDirectory, placeholders, minify = false } 
         });
     }
 
-    fs.writeFileSync(path.resolve(publicDirectory, 'index.html'), html);
+    fs.writeFileSync(path.resolve(publicDirectory, 'index.tpl'), html);
 };
 
 exports.downloadLayout = downloadLayout;
