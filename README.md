@@ -12,8 +12,12 @@ yarn add -D https://github.com/plesk/plesk-common-layout.git
 * `minify` **boolean** Minify layout's html or not.
 * `placeholders` **object** The layout contains some points which you can override by your custom values.
     * `title` **string** A page title. For example: `Plesk Web Installer`.
-    * `css` **string** May contain html with links to stylesheets or a custom string for a template engine. For example: `<link rel="stylesheet" href="/assets/bundle.css" />`.
-    * `js` **string** May contain html with some scripts or a custom string for a template engine. For example: `<script src="/assets/bundle.js"></script>`.
+    * `head` **object**
+        * `prepend` **string** May contain html or a custom string for a template engine. For example: `<link rel="stylesheet" href="/assets/bundle.css" />`.
+        * `append` **string** May contain html or a custom string for a template engine.
+    * `body` **object**
+        * `prepend` **string** May contain html with some scripts or a custom string for a template engine. For example: `<script src="/assets/bundle.js"></script>`.
+        * `append` **string** May contain html with some scripts or a custom string for a template engine.
 
 ## Usage
 
@@ -26,7 +30,12 @@ const options = {
     minify: true,
     placeholders: {
         title: '{{ title }}',
-        js: '{{ js }}',
+        head: {
+            prepend: '{{ head_prepend }}',
+        },
+        body: {
+            append: '{{ body_append }}',
+        },
     },
 };
 

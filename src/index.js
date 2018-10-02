@@ -62,14 +62,24 @@ const addPlaceholders = ($, placeholders) => {
     if (!placeholders) {
         return;
     }
-    if (placeholders.css) {
-        $('head').prepend(placeholders.css);
-    }
-    if (placeholders.js) {
-        $('body').append(placeholders.js);
-    }
     if (placeholders.title) {
         $('head').append(`<title>${placeholders.title}</title>`);
+    }
+    if (placeholders.head) {
+        if (placeholders.head.prepend) {
+            $('head').prepend(placeholders.head.prepend);
+        }
+        if (placeholders.head.append) {
+            $('head').append(placeholders.head.append);
+        }
+    }
+    if (placeholders.body) {
+        if (placeholders.body.prepend) {
+            $('body').prepend(placeholders.body.prepend);
+        }
+        if (placeholders.body.append) {
+            $('body').append(placeholders.body.append);
+        }
     }
 };
 
