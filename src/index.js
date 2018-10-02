@@ -40,6 +40,7 @@ const removeUselessNodes = $ => {
         'head meta[property^="og:"]',
         'head meta[name^="twitter:"]',
         'header .mk-page-section-wrapper',
+        '#mk-boxed-layout meta',
     ].forEach(selector => {
         $(selector).remove();
     });
@@ -123,9 +124,12 @@ const downloadLayout = async ({ publicDirectory, placeholders, minify = false } 
     addPlaceholders($, placeholders);
 
     // empty nodes
-    $('.mk-main-wrapper-holder')
+    $('#theme-page')
         .empty()
-        .append('<div id="root"></div>');
+        .removeAttr('class')
+        .removeAttr('role')
+        .removeAttr('itemprop')
+        .attr('id', 'root');
 
     // modify nodes
     $('.mk-header-padding-wrapper').attr('style', 'min-height: 130px');
