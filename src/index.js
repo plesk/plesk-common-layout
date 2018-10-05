@@ -41,6 +41,8 @@ const removeUselessNodes = $ => {
         'head meta[name^="twitter:"]',
         'header .mk-page-section-wrapper',
         '#mk-boxed-layout meta',
+        'script:contains("googletagmanager")',
+        'noscript:contains("googletagmanager")',
     ].forEach(selector => {
         $(selector).remove();
     });
