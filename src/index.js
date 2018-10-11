@@ -1,3 +1,5 @@
+// Copyright 1999-2018. Plesk International GmbH. All rights reserved.
+
 'use strict';
 
 const fs = require('fs');
@@ -61,10 +63,7 @@ const fixLinks = $ => {
     });
 };
 
-const addPlaceholders = ($, placeholders) => {
-    if (!placeholders) {
-        return;
-    }
+const addPlaceholders = ($, placeholders = {}) => {
     if (placeholders.title) {
         $('head').append(`<title>${placeholders.title}</title>`);
     }
@@ -83,6 +82,18 @@ const addPlaceholders = ($, placeholders) => {
         if (placeholders.body.append) {
             $('body').append(placeholders.body.append);
         }
+    }
+
+    // add root node
+    const node = $('#theme-page')
+        .empty()
+        .removeAttr('class')
+        .removeAttr('role')
+        .removeAttr('itemprop');
+    if (placeholders.root) {
+        node.append(placeholders.root);
+    } else {
+        node.attr('id', 'root');
     }
 };
 
@@ -113,30 +124,23 @@ const collectFiles = async ($, publicDirectory) => {
     }
 };
 
-const downloadLayout = async ({ publicDirectory, placeholders, minify = false } = {}) => {
+const downloadLayout = async ({ filename, publicDirectory, placeholders, minify = false, modify } = {}) => {
     if (!publicDirectory) {
         throw new Error('The "publicDirectory" option is required');
     }
     let html = await getHTML('https://www.plesk.com/extensions/');
-    const $ = cheerio.load(html);
+    const $ = cheerio.load(html, { decodeEntities: false });
 
     removeUselessNodes($);
     removeHighlightFromMenu($);
     fixLinks($);
     addPlaceholders($, placeholders);
 
-    // empty nodes
-    $('#theme-page')
-        .empty()
-        .removeAttr('class')
-        .removeAttr('role')
-        .removeAttr('itemprop')
-        .attr('id', 'root');
-
-    // modify nodes
-    $('.mk-header-padding-wrapper').attr('style', 'min-height: 130px');
-
     await collectFiles($, publicDirectory);
+
+    if (typeof modify === 'function') {
+        modify($);
+    }
 
     html = $.html();
     if (minify) {
@@ -146,8 +150,12 @@ const downloadLayout = async ({ publicDirectory, placeholders, minify = false } 
             minifyJS: true,
         });
     }
+    if (!filename) {
+        filename = path.resolve(publicDirectory, 'index.tpl');
+    }
 
-    fs.writeFileSync(path.resolve(publicDirectory, 'index.tpl'), html);
+    await fse.ensureDir(path.dirname(filename));
+    fs.writeFileSync(filename, html);
 };
 
 exports.downloadLayout = downloadLayout;
