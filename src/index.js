@@ -45,6 +45,9 @@ const removeUselessNodes = $ => {
         '#mk-boxed-layout meta',
         'script:contains("googletagmanager")',
         'noscript:contains("googletagmanager")',
+        '.header-toolbar-contact',
+        '.main-nav-side-search',
+        '.responsive-searchform',
     ].forEach(selector => {
         $(selector).remove();
     });
