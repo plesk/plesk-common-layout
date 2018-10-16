@@ -48,6 +48,7 @@ const removeUselessNodes = $ => {
         '.header-toolbar-contact',
         '.main-nav-side-search',
         '.responsive-searchform',
+        'script:contains("!loading")',
     ].forEach(selector => {
         $(selector).remove();
     });
