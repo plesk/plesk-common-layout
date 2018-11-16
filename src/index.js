@@ -49,6 +49,7 @@ const removeUselessNodes = $ => {
         '.main-nav-side-search',
         '.responsive-searchform',
         'script:contains("!loading")',
+        'script:contains("livechatinc.com")',
     ].forEach(selector => {
         $(selector).remove();
     });
