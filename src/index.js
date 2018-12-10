@@ -51,6 +51,8 @@ const removeUselessNodes = $ => {
         '.responsive-searchform',
         'script:contains("!loading")',
         'script:contains("livechatinc.com")',
+        'script:contains("connect.facebook.net")',
+        'noscript:contains("www.facebook.com")',
     ].forEach(selector => {
         $(selector).remove();
     });
