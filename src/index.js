@@ -112,6 +112,9 @@ const applyToSources = async ($, fn) => {
     $('link[href*="/wp-content/"]').each(collect('href'));
     $('script[src*="/wp-content/"]').each(collect('src'));
     $('script[src*="/wp-includes/"]').each(collect('src'));
+    if (lazyFns.length === 0) {
+        throw new Error('No matches found.');
+    }
     for (let lazyFn of lazyFns) {
         await lazyFn();
     }
