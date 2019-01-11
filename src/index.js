@@ -112,6 +112,7 @@ const applyToSources = async ($, fn) => {
     };
     $('img[data-cfsrc*="/wp-content/"]').each(collect('data-cfsrc'));
     $('link[href*="/wp-content/"]').each(collect('href'));
+    $('link[href*="/wp-includes/"]').each(collect('href'));
     $('script[src*="/wp-content/"]').each(collect('src'));
     $('script[src*="/wp-includes/"]').each(collect('src'));
     if (lazyFns.length === 0) {
@@ -162,7 +163,7 @@ const downloadLayout = async ({ url = 'https://www.plesk.com/extensions/', filen
         removeUselessNodes($);
         removeHighlightFromMenu($);
         fixLinks($);
-        fixSources($);
+        await fixSources($);
         fixRoot($);
     }
 
