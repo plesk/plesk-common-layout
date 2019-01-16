@@ -53,6 +53,7 @@ const removeUselessNodes = $ => {
         'script:contains("livechatinc.com")',
         'script:contains("connect.facebook.net")',
         'noscript:contains("www.facebook.com")',
+        '.mk-go-top',
     ].forEach(selector => {
         $(selector).remove();
     });
