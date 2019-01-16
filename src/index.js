@@ -2,7 +2,7 @@
 
 'use strict';
 
-const { URL } = require('url');
+const { URL, parse } = require('url');
 const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
@@ -137,7 +137,11 @@ const fixSources = async ($, selectors) => {
 const collectFiles = async ($, { publicDirectory, origin }) => {
     const fn = attr => async (i, node) => {
         let src = node.attribs[attr];
-        const dst = path.resolve(publicDirectory, src.replace(/^\//, ''));
+        let { pathname: dst } = parse(src);
+        if (!dst) {
+            throw new Error('Invalid file url');
+        }
+        dst = path.resolve(publicDirectory, dst.replace(/^\//, ''));
         if (!dst.startsWith(path.resolve(publicDirectory))) {
             throw new Error(`The source url "${src}" is invalid`);
         }
