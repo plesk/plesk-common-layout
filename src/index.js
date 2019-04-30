@@ -21,6 +21,9 @@ const downloadFile = (src, dst) => new Promise((resolve, reject) => {
 
 const getHTML = src => new Promise((resolve, reject) => {
     https.get(src, res => {
+        if (res.statusCode !== 200) {
+            reject(new Error(`Invalid status code: ${res.statusCode}`));
+        }
         let data = '';
         res.on('data', chunk => {
             data += chunk;
@@ -32,6 +35,14 @@ const getHTML = src => new Promise((resolve, reject) => {
         res.on('error', reject);
     });
 });
+
+const checkTitle = $ => {
+    const expected = 'Plesk Extensions';
+    const actual = $('title').text();
+    if (actual !== expected) {
+        throw new Error(`Title must be "${expected}", got "${actual}"`);
+    }
+};
 
 const removeUselessNodes = $ => {
     [
@@ -138,6 +149,9 @@ const fixSources = async ($, selectors) => {
 const collectFiles = async ($, { publicDirectory, origin }) => {
     const fn = attr => async (i, node) => {
         let src = node.attribs[attr];
+        if (src.startsWith('http')) {
+            return;
+        }
         let { pathname: dst } = parse(src);
         if (!dst) {
             throw new Error('Invalid file url');
@@ -165,6 +179,7 @@ const downloadLayout = async ({ url = 'https://www.plesk.com/extensions/', filen
     const { origin } = new URL(url);
 
     if (origin === 'https://www.plesk.com') {
+        checkTitle($);
         removeUselessNodes($);
         removeHighlightFromMenu($);
         fixLinks($);
