@@ -123,6 +123,8 @@ const applyToSources = async ($, fn) => {
         lazyFns.push(() => fn(attr)(...args));
     };
     $('img[data-cfsrc*="/wp-content/"]').each(collect('data-cfsrc'));
+    $('img[src*="/wp-content/"]').each(collect('src'));
+    $('img[data-lazy-src*="/wp-content/"]').each(collect('data-lazy-src'));
     $('link[href*="/wp-content/"]').each(collect('href'));
     $('link[href*="/wp-includes/"]').each(collect('href'));
     $('script[src*="/wp-content/"]').each(collect('src'));
