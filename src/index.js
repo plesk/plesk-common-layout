@@ -65,6 +65,7 @@ const removeUselessNodes = $ => {
         'script:contains("connect.facebook.net")',
         'noscript:contains("www.facebook.com")',
         '.mk-go-top',
+        '.popuppromo',
     ].forEach(selector => {
         $(selector).remove();
     });
