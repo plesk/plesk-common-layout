@@ -65,7 +65,7 @@ const removeUselessNodes = $ => {
         'script:contains("connect.facebook.net")',
         'noscript:contains("www.facebook.com")',
         '.mk-go-top',
-        '.popuppromo',
+        'script[src*="/wp-content/themes/plesk/inc/js/plesk-popup.js"]',
     ].forEach(selector => {
         $(selector).remove();
     });
