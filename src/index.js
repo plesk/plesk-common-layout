@@ -85,11 +85,8 @@ const fixLinks = $ => {
 };
 
 const fixRoot = $ => {
-    $('#theme-page')
+    $('.jupiterx-main-content .container .row > div')
         .empty()
-        .removeAttr('class')
-        .removeAttr('role')
-        .removeAttr('itemprop')
         .attr('id', 'root');
 };
 
