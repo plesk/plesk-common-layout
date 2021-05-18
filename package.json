@@ -10,6 +10,8 @@
     "license": "UNLICENSED",
     "dependencies": {
         "cheerio": "^1.0.0-rc.5",
+        "css": "^3.0.0",
+        "fast-glob": "^3.2.5",
         "fs-extra": "^7.0.0",
         "html-minifier": "^3.5.20"
     }
