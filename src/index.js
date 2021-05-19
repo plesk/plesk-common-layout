@@ -5,10 +5,15 @@
 const { URL, parse } = require('url');
 const fs = require('fs');
 const fse = require('fs-extra');
+const util = require('util')
 const path = require('path');
 const https = require('https');
 const cheerio = require('cheerio');
 const { minify: minifyFn } = require('html-minifier');
+const css = require('css');
+const fg = require('fast-glob');
+
+const readFile = util.promisify(fs.readFile);
 
 const downloadFile = (src, dst) => new Promise((resolve, reject) => {
     https.get(src, res => {
@@ -168,6 +173,81 @@ const collectFiles = async ($, { publicDirectory, origin }) => {
     await applyToSources($, fn);
 };
 
+
+const collectStyleUrls = async ($, { publicDirectory, origin }) => {
+    const urls = [];
+    $('style').each((i, node) => {
+        const textNode = node.children[0];
+        if (!textNode.data) return;
+        const styleUrls = parseCssDataUrls(textNode.data);
+        for (const url of styleUrls) {
+            if (url.startsWith('/wp-content/') || url.startsWith('/wp-includes/')) {
+                urls.push(url);
+            }
+        }
+    });
+    for (const url of urls) {
+        const src = url.replace(/\?.*/,'');
+        const dst = path.resolve(publicDirectory, src.replace(/^\//, ''));
+        if (!fs.existsSync(dst)) {
+            await fse.ensureDir(path.dirname(dst));
+            await downloadFile(origin + src, dst);
+        }
+    }
+}
+
+const collectCssUrls = async ({ publicDirectory, origin }) => {
+    const files = await fg(`${publicDirectory}/**/*.css`);
+    const urls = [];
+    for (const file of files) {
+        const data = await readFile(file, 'utf-8');
+        const fileUrls = parseCssDataUrls(data);
+        for (const url of fileUrls) {
+            if (url.startsWith('/wp-content/') || url.startsWith('/wp-includes/')) {
+                urls.push(url);
+            } else if (url.startsWith('../')) {
+                urls.push(path.resolve(path.dirname(path.dirname(file.substring(publicDirectory.length))), url.substring(3)));
+            }
+        }
+    }
+    
+    for (const url of urls) {
+        const src = url.replace(/\?.*/,'');
+        const dst = path.resolve(publicDirectory, src.replace(/^\//, ''));
+        if (!fs.existsSync(dst)) {
+            await fse.ensureDir(path.dirname(dst));
+            await downloadFile(origin + src, dst);
+        }
+    }
+}
+
+const parseCssSafe = (data) => {
+    try {
+        return css.parse(data);
+    } catch (e) {
+        return null
+    }
+}
+
+const parseCssDataUrls = (data) => {
+    const urlRegexp = new RegExp(`url\\([\\'\\"]?(?<url>[\\w\\-\\=\\.\\?\\&\\#\\/]+)[\\'\\"]?\\)`, 'mg');
+    const obj = parseCssSafe(data);
+    if (!obj) return [];
+        
+    const urls = [];
+    obj.stylesheet.rules.forEach(({ declarations }) => {
+        declarations && declarations.forEach(({ value }) => {
+            if (!value) return;
+            const mathes = value.matchAll(urlRegexp);
+            for (const m of mathes) {
+                urls.push(m.groups.url);
+            }
+        })
+    })
+    return urls;
+}
+
+
 const downloadLayout = async ({ url = 'https://www.plesk.com/extensions/', filename, publicDirectory, placeholders, minify = false, modify } = {}) => {
     if (!publicDirectory) {
         throw new Error('The "publicDirectory" option is required');
@@ -190,6 +270,8 @@ const downloadLayout = async ({ url = 'https://www.plesk.com/extensions/', filen
     addPlaceholders($, placeholders);
 
     await collectFiles($, { publicDirectory, origin });
+    await collectStyleUrls($, { publicDirectory, origin });
+    await collectCssUrls({ publicDirectory, origin });
 
     if (typeof modify === 'function') {
         modify($);
