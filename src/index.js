@@ -53,6 +53,7 @@ const removeUselessNodes = $ => {
     [
         'head title',
         'head script[src="/wp-content/themes/plesk/assets/js/plugins/cookies/cookiesSystem.js"]',
+        'head script[src="https://consent.cookiebot.com/uc.js"]',
         'head meta[name="description"]',
         'head link[rel="canonical"]',
         'head link[rel="next"]',
