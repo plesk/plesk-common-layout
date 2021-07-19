@@ -91,7 +91,7 @@ const fixLinks = $ => {
 };
 
 const fixRoot = $ => {
-    $('.jupiterx-main-content .container .row > div')
+    $('main#main')
         .empty()
         .attr('id', 'root');
 };
@@ -211,7 +211,7 @@ const collectCssUrls = async ({ publicDirectory, origin }) => {
             }
         }
     }
-    
+
     for (const url of urls) {
         const src = url.replace(/\?.*/,'');
         const dst = path.resolve(publicDirectory, src.replace(/^\//, ''));
@@ -234,7 +234,7 @@ const parseCssDataUrls = (data) => {
     const urlRegexp = new RegExp(`url\\([\\'\\"]?(?<url>[\\w\\-\\=\\.\\?\\&\\#\\/]+)[\\'\\"]?\\)`, 'mg');
     const obj = parseCssSafe(data);
     if (!obj) return [];
-        
+
     const urls = [];
     obj.stylesheet.rules.forEach(({ declarations }) => {
         declarations && declarations.forEach(({ value }) => {
